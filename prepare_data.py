@@ -4,14 +4,14 @@ import os
 import glob
 from utils import write_csv,read_csv
 
-def preprocess(gt,df_lf):
+def preprocess(gt,df_lf): # data cleaning and preparation
     df_gt = gt
     df_gt = df_gt.drop(columns = ['time','type','pos_noise','spd_noise'])
     
     lf_t3 = df_lf[df_lf['type']==3] 
     lf_t3 = lf_t3.drop(columns=['rcvTime','type','sendTime','noise','spd_noise','pos_noise','RSSI'])
     
-    merged_t3 = pd.merge(lf_t3, df_gt, on = "messageID")
+    merged_t3 = pd.merge(lf_t3, df_gt, on = "messageID") # merging the groundtruth files and log files with messageid as the key.
     prim_X = merged_t3.drop(columns = ['sender_x','sender_y','messageID']) 
     
     px = pd.DataFrame(prim_X["pos_x"].to_list(), columns=['p_l_x', 'p_l_y','p_l_z'])
@@ -24,20 +24,20 @@ def preprocess(gt,df_lf):
     
     return cnct
 
-def get_files(dir_path='results/'):
+def get_files(dir_path='results/'): # fetching and reading the json from the downloaded data
     files = glob.glob(dir_path+'*.json')
-    df = pd.read_json(files[1],lines=True)
-    gt = pd.read_json(files[0],lines=True)
+    df = pd.read_json(files[1],lines=True) # log files
+    gt = pd.read_json(files[0],lines=True) # ground truth files
     for i in range(2,len(files)):
         temp = pd.read_json(files[i],lines=True)
         df = df.append(temp)
     return df,gt
 
-def get_from_folder(base_path,folder_path = 'work/ul/ul_vertsys/ul_wqy57/'):
+def get_from_folder(base_path,folder_path = 'work/ul/ul_vertsys/ul_wqy57/'): # storing data as list
     path = os.path.join(base_path,folder_path)
     folders = os.listdir(path)
     
-    X = pd.DataFrame()
+    X = pd.DataFrame() 
     j=1
     for i in folders:
         folder_sims = os.path.join(path,i+'/veins-maat/simulations/securecomm2018/results/')
@@ -49,10 +49,12 @@ def get_from_folder(base_path,folder_path = 'work/ul/ul_vertsys/ul_wqy57/'):
     return X
 
 if __name__=='__main__':
-    X = get_from_folder('D:/PYTHON/Notes/Research-Notes/')
+    
+    base_path = 'D:/PYTHON/Notes/Research-Notes/'
+    X = get_from_folder(base_path) 
     X = X.drop_duplicates()
     
     fields = X.columns
     final_l =  X.values.tolist()
     
-    write_csv(fields,final_l)
+    write_csv(fields,final_l) # saving the prepared data to csv file.  

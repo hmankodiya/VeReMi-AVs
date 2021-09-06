@@ -15,20 +15,25 @@ pd.set_option("display.precision", 16)
 
 if __name__ == "__main__":
     
-    rows,fields = read_csv('final_dataset.csv')
-    df_m = pd.DataFrame(rows,columns=fields)
+    rows,fields = read_csv('final_dataset.csv') # reading the csv file which was just prepared.
+    df_m = pd.DataFrame(rows,columns=fields)    # converting the csv file to dataframe.
     
-    df = df_m.drop(columns=['p_g_x','p_g_y','p_g_z','s_g_x','s_g_y','s_g_z'])
+    df = df_m.drop(columns=['p_g_x','p_g_y','p_g_z','s_g_x','s_g_y','s_g_z']) # dropping the irrelevant columns
     
-    df.loc[df[df['attackerType']!='0'].index,'attackerType']='1'
+    df.loc[df[df['attackerType']!='0'].index,'attackerType']='1' 
     df.loc[df[df['attackerType']=='0'].index,'attackerType']='0'
     
     y = df['attackerType']
     X = df.iloc[:,:6]
     
-    ss = StandardScaler()
+    ss = StandardScaler() # applying the standard scaler to the data
     X = ss.fit_transform(X)
     X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.2)
+    
+    
+    '''
+    We compare three approaches, to train the VeReMi dataset.
+    '''
     
     
     # DecisionTreeClassifier
